@@ -38,7 +38,25 @@ const router = createRouter({
         layout: 'main',
         auth: true,
       }
-    } 
+    },
+    {
+      path: '/groups/:id',
+      name: 'GroupView',
+      component: () => import('../views/MainLayout/GroupView.vue'),
+      meta: {
+        layout: 'main',
+        auth: true,
+      }
+    },
+    {
+      path: '/students/:id',
+      name: 'StudentView',
+      component: () => import('../views/MainLayout/StudentView.vue'),
+      meta: {
+        layout: 'main',
+        auth: true,
+      }
+    }
   ],
 
   linkActiveClass: 'active',
@@ -52,7 +70,7 @@ router.beforeEach((to, from, next) => {
   const isAuth = store.getters['auth/isAuthenticated'];
 
   if (isAuth && to.path === '/login') {
-    return next('/'); // Login sahifasiga kirgan bo‘lsa, lekin allaqachon login bo‘lsa, homega
+    return next('/');
   }
 
   if (requireAuth && !isAuth) {

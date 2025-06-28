@@ -32,29 +32,35 @@ export default {
                         Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
                     },
                 });
+                const user = JSON.parse(localStorage.getItem("user"));
+                const userId = Number(user?.Id);
 
-                console.log(response);
+                const filteredGroups = response.data.filter(group => group.teacher.user.id === userId);
+
+                console.log(filteredGroups);
                 
-                commit("SET_GROUPS", response.data);
+                commit("SET_GROUPS", filteredGroups);
             } catch (e) {
                 console.log(e);
             }
         },
+
         async getGroupById({ commit }, Id) {
-            commit("SET_LOADING", true, { root: true });
             try {
                 const response = await axios.get(`${API_URL}/${Id}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
                     },
                 });
+
+                console.log('guruh:', response.data);
+                
                 return response.data;
             } catch (e) {
                 // toast.error(e.response?.data?.message || "Guruhni olishda xatolik!");
             }
         },
         async addGroup({ commit }, payload) {
-            commit("SET_LOADING", true, { root: true });
             try {
                 const response = await axios.post(API_URL, payload, {
                     headers: {
@@ -70,7 +76,6 @@ export default {
             }
         },
         async updateGroup({ commit }, payload) {
-            commit("SET_LOADING", true, { root: true });
             try {
                 const response = await axios.post(`${API_URL}/${payload.id}`, payload, {
                     headers: {
@@ -85,7 +90,6 @@ export default {
             }
         },
         async deleteGroup({ commit }, Id) {
-            commit("SET_LOADING", true, { root: true });
             try {
                 const response = await axios.delete(`${API_URL}/${Id}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },

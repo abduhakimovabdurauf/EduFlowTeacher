@@ -1,7 +1,18 @@
 import axios from "../../axios/settings.js";
-// import { useToast } from "vue-toastification";
 import router from "../../router/index.js";
-// const toast = useToast();
+
+// JWT tokenni ajratib, foydalanuvchi ma’lumotlarini olish
+function parseJwt(token) {
+    try {
+        const base64Payload = token.split('.')[1];
+        const jsonPayload = atob(base64Payload);
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error("JWT parsing error:", e);
+        return null;
+    }
+}
+
 export default {
     namespaced: true,
     state() {
@@ -13,11 +24,15 @@ export default {
         setToken(state, token) {
             state.token = token;
             localStorage.setItem("jwt-token", token);
-            localStorage.setItem("jwt-token-expiry", Date.now() + 8 * 60 * 60 * 1000);
+            localStorage.setItem("jwt-token-expiry", Date.now() + 8 * 60 * 60 * 1000); // 8 soat
+
+            // 🔥 Foydalanuvchi ma’lumotlarini ajratib olish va localStoragega saqlash
+            const userData = parseJwt(token);
+            if (userData) {
+                localStorage.setItem("user", JSON.stringify(userData));
+            }
         },
         LOGOUT(state) {
-            console.log('logut ishladi!');
-            
             state.token = null;
             localStorage.removeItem("jwt-token");
             localStorage.removeItem("jwt-token-expiry");
@@ -32,51 +47,47 @@ export default {
                 const response = await axios.post(url, payload);
                 const token = response?.data;
                 commit("setToken", token);
-                console.log('response: ', response);
-                
-                // localStorage.setItem("user",JSON.stringify(response.data.user));
-                // toast.success(response.data.message || "Login successful!");
-                return response.data.user
+                return parseJwt(token); // foydalanuvchini qaytarish uchun
             } catch (e) {
-                console.error(e.message);
-                // toast.error(e.response?.data?.message || "Login failed!");
+                console.error("Login error:", e.message);
             }
         },
         async logout({ commit }) {
             try {
                 const url = `${import.meta.env.VITE_API_URL}/logout`;
-                const response = await axios.post(url, {}, {
+                await axios.post(url, {}, {
                     headers: { Authorization: `Bearer ${localStorage.getItem("jwt-token")}` },
                 });
                 commit("LOGOUT");
-                // toast.success(response.data.message);
             } catch (e) {
-                console.error(e.message);
-                // toast.error(e.response?.data?.message || "Logout failed!");
+                console.error("Logout error:", e.message);
             }
         },
-        checkToken({ commit }) {
+        checkToken({ commit, dispatch }) {
             const token = localStorage.getItem("jwt-token");
             const expiry = localStorage.getItem("jwt-token-expiry");
-            
+
             if (token && expiry) {
                 if (Date.now() > expiry) {
-                    localStorage.removeItem("jwt-token");
-                    localStorage.removeItem("jwt-token-expiry");
-                    console.error("Token muddati tugagan!");
-                    // commit('LOGOUT');
-                    dispatch('logout')
+                    console.warn("Token muddati tugagan!");
+                    dispatch("logout");
                 } else {
-                    commit('setToken', token);
+                    commit("setToken", token);
                 }
             } else {
-                commit('LOGOUT');
+                commit("LOGOUT");
             }
         }
-
     },
     getters: {
         token: (state) => state.token,
         isAuthenticated: (state) => !!state.token,
+        user: () => {
+            try {
+                return JSON.parse(localStorage.getItem("user"));
+            } catch {
+                return null;
+            }
+        }
     },
 };

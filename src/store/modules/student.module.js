@@ -56,16 +56,17 @@ export default {
         },
 
         async getStudentById({ commit }, Id) {
-            commit("SET_LOADING", true, { root: true });
             try {
                 const response = await axios.get(`${API_URL}/${Id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
-                    },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
+                },
                 });
+                console.log(response);
+                
                 return response.data;
             } catch (e) {
-                // toast.error(e.response?.data?.message || "Failed to fetch student!");
+                console.log(e);
             }
         },
         async addStudent({ commit }, payload) {
@@ -74,7 +75,7 @@ export default {
             try {
                 const response = await axios.post(API_URL, payload, {
                     headers: {
-                        "Content-Type": "multipart/form-data",
+                        "Content-Type": "application/json",
                         Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
                     },
                 });
@@ -87,18 +88,19 @@ export default {
         },
         async updateStudent({ commit }, payload) {
             commit("SET_LOADING", true, { root: true });
-            console.log("payload.id: ", payload);
+
             try {
-                const response = await axios.post(`${API_URL}/${payload.id}`, payload, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
-                    },
+                await axios.put(`${API_URL}/${payload.id}`, payload, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
+                },
                 });
-                commit("UPDATE_STUDENT", response.data.student);
-                // toast.success(response.data.message);
+
+                // Agar API qaytarmasa yangilangan studentni, localdan foydalanamiz
+                commit("UPDATE_STUDENT", payload);
             } catch (e) {
-                // toast.error(e.response?.data?.message || "Oquvchi malumotlarini yangilashda xatolik!");
+                console.log("O'zgartirishda xatolik:", e);
             }
         },
         async deleteStudent({ commit }, Id) {
