@@ -1,4 +1,7 @@
 import axios from "../../axios/settings";
+import { useToast } from "vue-toastification";
+
+const toast = useToast();
 
 const API_URL = `${import.meta.env.VITE_API_URL}/lessons`;
 
@@ -7,9 +10,10 @@ export default {
   state: () => ({
     lessons: [],
   }),
+
   mutations: {
     SET_LESSONS(state, lessons) {
-      state.lessons = lessons;
+      state.lessons = lessons.slice().reverse();
     },
     ADD_LESSON(state, lesson) {
       state.lessons.unshift(lesson);
@@ -22,7 +26,22 @@ export default {
       state.lessons = state.lessons.filter((lesson) => lesson.id !== lessonId);
     },
   },
+
   actions: {
+    async getAllLessons({ commit }) {
+      try {
+        const response = await axios.get(API_URL, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
+          },
+        });
+        commit("SET_LESSONS", response.data);
+        return response.data;
+      } catch (error) {
+        toast.error("Barcha darslarni olishda xatolik yuz berdi.");
+      }
+    },
+
     async getLessonsByGroup({ commit }, groupId) {
       try {
         const response = await axios.get(`${API_URL}/group/${groupId}`, {
@@ -30,18 +49,26 @@ export default {
             Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
           },
         });
-
-        console.log('lessons:', response.data);
-        
         commit("SET_LESSONS", response.data);
       } catch (error) {
-        console.log("Darslarni olishda xatolik:", error);
+        toast.error("Guruh darslarini olishda xatolik yuz berdi.");
+      }
+    },
+
+    async getLessonById(_, id) {
+      try {
+        const response = await axios.get(`${API_URL}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
+          },
+        });
+        return response.data;
+      } catch (error) {
+        toast.error("Darsni olishda xatolik yuz berdi.");
       }
     },
 
     async addLesson({ commit }, payload) {
-      console.log('payload: ', payload);
-      
       try {
         const response = await axios.post(API_URL, payload, {
           headers: {
@@ -49,12 +76,10 @@ export default {
             "Content-Type": "application/json",
           },
         });
-
-        console.log('response: ', response);
-        
         commit("ADD_LESSON", response.data);
+        toast.success("Dars muvaffaqiyatli qo‘shildi!");
       } catch (error) {
-        console.log("Dars qo‘shishda xatolik:", error);
+        toast.error("Dars qo‘shishda xatolik yuz berdi.");
       }
     },
 
@@ -67,8 +92,9 @@ export default {
           },
         });
         commit("UPDATE_LESSON", response.data);
+        toast.success("Dars muvaffaqiyatli yangilandi!");
       } catch (error) {
-        console.log("Darsni yangilashda xatolik:", error);
+        toast.error("Darsni yangilashda xatolik yuz berdi.");
       }
     },
 
@@ -80,11 +106,13 @@ export default {
           },
         });
         commit("DELETE_LESSON", lessonId);
+        toast.success("Dars muvaffaqiyatli o‘chirildi!");
       } catch (error) {
-        console.log("Darsni o‘chirishda xatolik:", error);
+        toast.error("Darsni o‘chirishda xatolik yuz berdi.");
       }
     },
   },
+
   getters: {
     lessons(state) {
       return state.lessons;
