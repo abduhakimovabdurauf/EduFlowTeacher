@@ -26,8 +26,7 @@ export default {
     setToken(state, token) {
       state.token = token;
       localStorage.setItem("jwt-token", token);
-      localStorage.setItem("jwt-token-expiry", Date.now() + 8 * 60 * 60 * 1000); // 8 soat
-
+      localStorage.setItem("jwt-token-expiry", Date.now() + 8 * 60 * 60 * 1000);
       const userData = parseJwt(token);
       if (userData) {
         localStorage.setItem("user", JSON.stringify(userData));

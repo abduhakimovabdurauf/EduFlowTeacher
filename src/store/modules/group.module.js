@@ -35,8 +35,9 @@ export default {
         });
 
         const user = JSON.parse(localStorage.getItem("user"));
+        
         const userId = Number(user?.Id);
-        const filteredGroups = response.data.filter(group => group.teacher.user.id === userId);
+        const filteredGroups = response.data.filter(group => group.teacher.userId === userId);
 
         commit("SET_GROUPS", filteredGroups);
       } catch (e) {
@@ -73,17 +74,22 @@ export default {
     },
 
     async updateGroup({ commit }, payload) {
+      console.log('payload: ', payload);
+      
       try {
-        const response = await axios.post(`${API_URL}/${payload.id}`, payload, {
+        const response = await axios.put(`${API_URL}/${payload.id}`, payload, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
           },
         });
+        console.log(response);
+        
         commit("UPDATE_GROUP", response.data.group);
         toast.success(response.data.message || "Guruh muvaffaqiyatli yangilandi.");
       } catch (e) {
-        toast.error(e.response?.data?.message || "Guruhni yangilashda xatolik yuz berdi.");
+        console.log(e);
+        // toast.error(e.response?.data?.message || "Guruhni yangilashda xatolik yuz berdi.");
       }
     },
 

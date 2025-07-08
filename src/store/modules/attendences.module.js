@@ -86,7 +86,6 @@ export default {
           },
         });
         commit("ADD_ATTENDANCE", response.data);
-        // toast.success("Davomat muvaffaqiyatli qo‘shildi!");
       } catch (e) {
         console.error("Davomat qo‘shishda xatolik yuz berdi.");
       }

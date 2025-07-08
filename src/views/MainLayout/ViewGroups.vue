@@ -27,7 +27,7 @@
           >
             <td class="px-2 py-2 text-gray-500">{{ index + 1 }}</td>
             <td class="px-2 py-2 font-medium text-gray-900">{{ group.name }}</td>
-            <td class="px-2 py-2">{{ group.teacher.user.firstname }}</td>
+            <td class="px-2 py-2">{{ getTeacherFullName(group.teacher.userId) }}</td>
             <td class="px-2 py-2 hidden md:table-cell">{{ group.course.name }}</td>
             <td class="px-2 py-2 hidden sm:table-cell">
               {{ group.createdAt }}
@@ -80,7 +80,7 @@
             <td class="px-4 py-3 text-gray-500">{{ index + 1 }}</td>
             <td class="px-4 py-3 font-medium text-gray-900">{{ group.name }}</td>
             <td class="px-4 py-3">{{ group.course?.name }}</td>
-            <td class="px-4 py-3">{{ group.teacher?.user?.firstname + ' ' + group.teacher?.user?.lastname }}</td>
+            <td class="px-4 py-3">{{ getTeacherFullName(group.teacher.userId) }}</td>
             <td class="px-4 py-3">{{ group.students?.length }} ta</td>
             <td class="px-4 py-3">
               <span
@@ -192,14 +192,15 @@ import { ref, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router'; 
 import axios from "../../axios/settings";
+
 export default {
   setup() {
     const store = useStore();
     const router = useRouter();
     const groups = computed(() => store.getters['group/groups']);
-
     const selectedGroup = ref(null);
     const isSidebarOpen = ref(false);
+    const teachers = ref([]);
 
     const viewGroup = (group) => {
       router.push(`/groups/${group.id}`);
@@ -207,9 +208,8 @@ export default {
 
     const closeSidebar = () => {
       isSidebarOpen.value = false;
+      selectedGroup.value = null;
     };
-
-    const teachers = ref([]);
 
     const getAllTeachers = async () => {
       try {
@@ -225,19 +225,46 @@ export default {
     };
 
     const editGroup = (group) => {
-      selectedGroup.value = group;
+      selectedGroup.value = { ...group }; // clone qilish
       isSidebarOpen.value = true;
       getAllTeachers();
-      console.log(selectedGroup.value);
-      
     };
 
+    const getTeacherFullName = (userId) => {
+      const teacher = teachers.value.find(
+        (t) => t.userId === userId || t.user?.id === userId
+      );
+      if (teacher?.user) {
+        return `${teacher.user.firstname} ${teacher.user.lastname}`;
+      }
+      return 'Nomaʼlum';
+    };
+
+    const saveChanges = async () => {
+      if (!selectedGroup.value) return;
+
+      const payload = {
+        id: selectedGroup.value.id,
+        name: selectedGroup.value.name,
+        teacherId: selectedGroup.value.teacherId,
+        courseId: selectedGroup.value.course?.id,
+        isStatus: selectedGroup.value.isStatus,
+      };
+
+      try {
+        await store.dispatch("group/updateGroup", payload);
+        isSidebarOpen.value = false;
+        selectedGroup.value = null;
+        await store.dispatch("group/getAllGroups");
+      } catch (error) {
+        console.error("Saqlashda xatolik:", error);
+      }
+    };
 
 
     onMounted(() => {
       store.dispatch('group/getAllGroups');
-      console.log(groups.value);
-      
+      getAllTeachers();
     });
 
     return {
@@ -248,11 +275,13 @@ export default {
       isSidebarOpen,
       closeSidebar,
       teachers,
+      getTeacherFullName,
+      saveChanges,
     };
   },
 };
-
 </script>
+
 
 
 <style scoped>

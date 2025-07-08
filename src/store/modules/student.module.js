@@ -33,7 +33,12 @@ export default {
             Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
           },
         });
-        commit("SET_STUDENTS", response.data);
+        const teacherInfo = JSON.parse(localStorage.getItem("teacher"))
+        const filteredStudents = response.data.filter((f) => {
+          return f.groups?.some(group => group.courseId === teacherInfo.courseId);
+        });
+        
+        commit("SET_STUDENTS", filteredStudents);
       } catch (e) {
         toast.error(e.response?.data?.message || "O‘quvchilarni olishda xatolik yuz berdi!");
       }
