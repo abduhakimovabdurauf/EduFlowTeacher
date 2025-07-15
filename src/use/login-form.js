@@ -22,7 +22,7 @@ export function useLoginForm() {
     yup
       .string()
       .required('Parol kiritilishi shart')
-      .min(6, 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak')
+      .min(4, 'Parol kamida 4 ta belgidan iborat bo\'lishi kerak')
   )
 
   

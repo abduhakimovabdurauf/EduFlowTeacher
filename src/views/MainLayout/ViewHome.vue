@@ -69,9 +69,26 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const teacher = ref(null);
-
+const teachers = ref([]);
+const teacher = ref(null)
+const user = JSON.parse(localStorage.getItem("user"));
+const userId = user?.Id;
+const getAllTeachers = async () => {
+  try {
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/teachers`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
+      },
+    });
+    teachers.value = response.data;
+    const teacher = teachers.value.find((t) => t.userId === Number(userId));
+    localStorage.setItem("teacher", JSON.stringify(teacher));
+  } catch (error) {
+    console.error("O‘qituvchilarni olishda xatolik:", error);
+  }
+};
 onMounted(() => {
+  getAllTeachers()
   const data = localStorage.getItem('teacher');
   if (data) {
     teacher.value = JSON.parse(data);
