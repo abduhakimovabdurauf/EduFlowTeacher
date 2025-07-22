@@ -5,9 +5,8 @@
 <script>
 import MainLayout from "./layouts/MainLayout.vue";
 import AuthLayout from "./layouts/AuthLayout.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed} from "vue";
 import { useRoute } from "vue-router";
-import axios from "./axios/settings.js";
 
 export default {
   components: {

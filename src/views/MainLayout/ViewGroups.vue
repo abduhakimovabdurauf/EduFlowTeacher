@@ -4,7 +4,6 @@
       Guruhlar ro‘yxati
     </h2>
 
-    <!-- Mobil uchun -->
     <div class="overflow-x-auto bg-white shadow rounded-xl border border-gray-200 block lg:hidden">
       <table class="min-w-full text-xs sm:text-sm text-gray-700 divide-y divide-gray-100">
         <thead class="bg-gray-800 text-white text-[10px] sm:text-xs uppercase font-semibold">

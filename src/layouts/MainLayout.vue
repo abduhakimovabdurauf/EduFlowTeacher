@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-white">
     <Sidebar />
-    <main class="pt-16 px-4"> <!-- top padding to account for navbar height -->
+    <main class="pt-16 px-4">
       <router-view />
     </main>
   </div>

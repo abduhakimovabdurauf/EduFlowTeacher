@@ -2,7 +2,7 @@ import axios from "../../axios/settings.js";
 import router from "../../router/index.js";
 import { useToast } from "vue-toastification";
 
-const toast = useToast(); // Toast instansiyasi
+const toast = useToast();
 
 function parseJwt(token) {
   try {
@@ -37,6 +37,7 @@ export default {
       localStorage.removeItem("jwt-token");
       localStorage.removeItem("jwt-token-expiry");
       localStorage.removeItem("user");
+      localStorage.removeItem("teacher");
       router.push("/login");
     },
   },
@@ -56,25 +57,6 @@ export default {
       }
     },
 
-    async logout({ commit }) {
-      try {
-        const url = `${import.meta.env.VITE_API_URL}/logout`;
-        await axios.post(
-          url,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("jwt-token")}`,
-            },
-          }
-        );
-        commit("LOGOUT");
-        toast.success("Tizimdan chiqdingiz.");
-      } catch (e) {
-        toast.error("Logout qilishda xatolik yuz berdi.");
-      }
-    },
-
     checkToken({ commit, dispatch }) {
       const token = localStorage.getItem("jwt-token");
       const expiry = localStorage.getItem("jwt-token-expiry");
@@ -82,7 +64,7 @@ export default {
       if (token && expiry) {
         if (Date.now() > expiry) {
           toast.warning("Sessiya muddati tugadi. Qayta kiring.");
-          dispatch("logout");
+          commit("LOGOUT");
         } else {
           commit("setToken", token);
         }
