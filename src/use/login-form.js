@@ -1,4 +1,4 @@
-// src/use/login-form.js
+
 import { useField, useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { computed, watch } from 'vue'
@@ -13,7 +13,7 @@ export function useLoginForm() {
     'phoneNumber',
     yup
       .string()
-      .required('phone, login yoki telefon raqam kiritilishi shart')
+      .required('telefon raqam kiritilishi shart')
       .matches(/^\+998\d{2}\d{3}\d{2}\d{2}$/, 'Telefon raqami formati noto‘g‘ri')
   )
 
