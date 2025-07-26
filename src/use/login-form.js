@@ -14,8 +14,12 @@ export function useLoginForm() {
     yup
       .string()
       .required('telefon raqam kiritilishi shart')
-      .matches(/^\+998\d{2}\d{3}\d{2}\d{2}$/, 'Telefon raqami formati noto‘g‘ri')
+      .matches(/^\+998\d{2}\d{3}\d{2}\d{2}$/, 'Telefon raqami formati noto‘g‘ri'),
+    {
+      initialValue: '+998'
+    }
   )
+
 
   const { value: password, errorMessage: passwordError, handleBlur: passwordBlur } = useField(
     'password',

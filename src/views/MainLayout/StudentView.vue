@@ -1,7 +1,8 @@
 <template>
-  <div class="max-w-2xl mx-auto px-4 py-10">
+  <div class="max-w-5xl mx-auto px-4 py-10">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">O'quvchi haqida ma'lumot</h2>
 
+    <!-- Student info -->
     <div v-if="student" class="bg-white rounded-lg shadow-md p-6 space-y-4">
       <div>
         <span class="text-gray-500">F.I.Sh.:</span>
@@ -21,6 +22,8 @@
           {{ student.phoneNumber }}
         </a>
       </div>
+
+      <!-- Guruhlar -->
       <div v-if="student.groups?.length">
         <span class="text-gray-500">Guruhlar:</span>
         <div class="flex flex-wrap gap-2 mt-1">
@@ -32,6 +35,36 @@
             {{ group.name }}
           </span>
         </div>
+      </div>
+    </div>
+
+    <!-- To'lovlar jadvali -->
+    <div v-if="student?.payments?.length" class="mt-10">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">To‘lovlar tarixi</h3>
+
+      <div class="overflow-x-auto rounded-lg shadow">
+        <table class="min-w-full bg-white text-sm text-left text-gray-700">
+          <thead class="bg-gray-700 text-white uppercase text-xs">
+            <tr>
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">Sana</th>
+              <th class="px-4 py-3">Miqdori</th>
+              <th class="px-4 py-3">Izoh</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(payment, index) in student.payments"
+              :key="index"
+              class="border-t hover:bg-gray-50 transition"
+            >
+              <td class="px-4 py-3 font-medium">{{ index + 1 }}</td>
+              <td class="px-4 py-3">{{ formatDate(payment.paymentDate) }}</td>
+              <td class="px-4 py-3">{{ payment.amount }} so'm</td>
+              <td class="px-4 py-3">{{ payment.comment || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -51,9 +84,17 @@ export default {
     const getStudent = async () => {
       const data = await store.dispatch('student/getStudentById', route.params.id);
       student.value = data;
-
-      console.log(data);
+      console.log('Student data:', student.value);
       
+    };
+
+    const formatDate = (isoString) => {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('uz-UZ', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      });
     };
 
     onMounted(() => {
@@ -61,7 +102,8 @@ export default {
     });
 
     return {
-      student
+      student,
+      formatDate
     };
   }
 };

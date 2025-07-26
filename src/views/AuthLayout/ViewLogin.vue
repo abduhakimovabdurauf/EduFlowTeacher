@@ -4,7 +4,6 @@
       <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">🔐 Kirish</h2>
 
       <form @submit.prevent="submit" class="space-y-6">
-        <!-- Telefon -->
         <div>
           <label for="phone" class="block text-sm font-medium text-gray-700">📱 Telefon raqam</label>
           <input
@@ -19,8 +18,6 @@
           />
           <p v-if="phoneError" class="text-xs text-red-600 mt-1">{{ phoneError }}</p>
         </div>
-
-        <!-- Parol -->
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700">🔑 Parol</label>
           <div class="relative">
@@ -34,7 +31,6 @@
               autocomplete="off"
               @blur="passwordBlur"
             />
-            <!-- 👁 toggle -->
             <button
               type="button"
               @click="showPassword = !showPassword"
@@ -47,7 +43,6 @@
           <p v-if="passwordError" class="text-xs text-red-600 mt-1">{{ passwordError }}</p>
         </div>
 
-        <!-- Submit Button -->
         <button
           type="submit"
           class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition-all duration-200 flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
@@ -70,7 +65,6 @@
           </svg>
         </button>
 
-        <!-- Status -->
         <p v-if="isSubmitting" class="text-sm text-gray-500 text-center">Kirilmoqda...</p>
       </form>
     </div>
